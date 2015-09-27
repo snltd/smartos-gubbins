@@ -1,0 +1,48 @@
+syntax on
+set t_Co=256
+set nocompatible
+set number
+set laststatus=2
+
+filetype plugin indent on
+
+set title
+set wrapmargin=4
+set tabstop=2
+set autoindent
+set shiftwidth=2
+set cursorline
+set showmatch
+set ignorecase
+set smartcase
+set incsearch
+set expandtab
+set nocp
+
+map Q gq
+map <F4> :set paste! <Bar> set paste?<CR>
+map <F12> :set invnumber<CR>
+
+" language specific settings
+
+autocmd Filetype xml setlocal ts=2 sts=2 sw=2
+autocmd Filetype html setlocal ts=2 sts=2 sw=2
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+autocmd Filetype javascript setlocal ts=2 sts=2 sw=2
+autocmd Filetype python setlocal ts=4 sts=4 sw=4
+autocmd Filetype sh setlocal ts=4 sts=4 sw=4 noexpandtab
+
+" strip trailing whitespace on save
+autocmd BufWritePre * :%s/\s\+$//e
+
+augroup markdown
+    au!
+    au BufNewFile,BufRead *.md,*.markdown setlocal filetype=ghmarkdown
+augroup END
+
+set title
+set titleold=""
+set titlestring=VIM:\ %F
+
+:map K <Nop>
+
