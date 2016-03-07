@@ -44,19 +44,26 @@
 #-----------------------------------------------------------------------------
 # VARIABLES
 
-RVER="2.2.3"
+grep -q Solaris /etc/release && IS_SOLARIS=true
+
+RVER="2.3.0"
 	# The version of Ruby to package
 
-PREFIX="/opt/local/ruby"
-	# Where the package will install
+# Where the package will install, and what to call the final package.
+# Change to suit your site.
 
-PKG_NAME="snltd-ruby-${RVER}.tgz"
-	# What to call the final package. Change to suit your site.
+if [[ -n $IS_SOLARIS ]]
+then
+    PREFIX="/opt/ruby"
+else
+    PREFIX="/opt/local/ruby"
+    PKG_NAME="snltd-ruby-${RVER}.tgz"
+fi
 
 DIR=$(mktemp -d)
 	# Temporary directory
 
-GEMLIST="puppet sinatra thin redcarpet mysql2 haml ruby-shadow bundle"
+GEMLIST="bundle puppet sinatra kramdown slim mysql2 ruby-shadow fluentd"
 	# Extra gems to include in the package
 
 PATH="/usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin"
@@ -82,6 +89,8 @@ then
 	tar zxf $RFILE
 	cd ${RFILE%.tar*}
 
+    gsed -i '13i#undef HAVE_SSLV2_METHOD' ext/openssl/ossl_ssl.c
+
 	./configure \
 		--with-opt-dir=/opt/local \
 		--prefix=$PREFIX \
@@ -99,35 +108,41 @@ do
 	${PREFIX}/bin/gem install $gem --no-rdoc --no-ri
 done
 
-find ${PREFIX} -type f | sed "s|${PREFIX}/||" >${DIR}/pkglist
-
-pkg_info -X pkg_install \
-  | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' \
-  >${DIR}/build-info
-
-print "vanilla Ruby ${RVER}" >${DIR}/comment
-
-print "Ruby ${RVER} with no dependencies. Includes the following gems" \
-	>${DIR}/description
-
-for gem in $GEMLIST
-do
-	print " - $gem"
-done >>${DIR}/description
-
-pkg_create \
-	-B ${DIR}/build-info \
-	-d ${DIR}/description \
-	-c ${DIR}/comment \
-	-f ${DIR}/pkglist \
-	-I $PREFIX \
-	-p $PREFIX \
-	-U \
-	${HOME}/${PKG_NAME}
-
-rm -fr $DIR
-
-if which mput >/dev/null 2>&1
+if [[ ${PKG_NAME##*.} == "tgz" ]]
 then
-	mput -f "${HOME}/${PKG_NAME}" "/$MANTA_USER/public"
+    find ${PREFIX} -type f | sed "s|${PREFIX}/||" >${DIR}/pkglist
+
+    pkg_info -X pkg_install \
+      | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' \
+      >${DIR}/build-info
+
+    print "vanilla Ruby ${RVER}" >${DIR}/comment
+
+    print "Ruby ${RVER} with no dependencies. Includes the following gems" \
+        >${DIR}/description
+
+    for gem in $GEMLIST
+    do
+        print " - $gem"
+    done >>${DIR}/description
+
+    pkg_create \
+        -B ${DIR}/build-info \
+        -d ${DIR}/description \
+        -c ${DIR}/comment \
+        -f ${DIR}/pkglist \
+        -I $PREFIX \
+        -p $PREFIX \
+        -U \
+        ${HOME}/${PKG_NAME}
+
+    rm -fr $DIR
+fi
+
+if [[ -n $PKG_NAME ]]
+then
+    if which mput >/dev/null 2>&1
+    then
+        mput -f "${HOME}/${PKG_NAME}" "/$MANTA_USER/public"
+    fi
 fi
