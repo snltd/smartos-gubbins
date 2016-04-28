@@ -63,7 +63,8 @@ fi
 DIR=$(mktemp -d)
 	# Temporary directory
 
-GEMLIST="bundle puppet sinatra kramdown slim mysql2 ruby-shadow fluentd"
+GEMLIST="bundle puppet sinatra kramdown slim mysql2 ruby-shadow fluentd
+         wavefront-client"
 	# Extra gems to include in the package
 
 PATH="/usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin"
