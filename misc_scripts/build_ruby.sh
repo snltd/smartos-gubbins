@@ -46,7 +46,7 @@
 
 grep -q Solaris /etc/release && IS_SOLARIS=true
 
-RVER="2.3.0"
+RVER="2.3.3"
 	# The version of Ruby to package
 
 # Where the package will install, and what to call the final package.
@@ -60,11 +60,13 @@ else
     PKG_NAME="snltd-ruby-${RVER}.tgz"
 fi
 
+#PREFIX=/opt/puppet
+
 DIR=$(mktemp -d)
 	# Temporary directory
 
-GEMLIST="bundle puppet sinatra kramdown slim mysql2 ruby-shadow fluentd
-         wavefront-client"
+GEMLIST="bundle puppet ruby-shadow fluentd wavefront-client \
+	     sinatra kramdown rouge puma slim"
 	# Extra gems to include in the package
 
 PATH="/usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin"
@@ -77,7 +79,7 @@ if [[ $1 != "nobuild" ]]
 then
 	RFILE="ruby-${RVER}.tar.bz2"
 
-	rm -fr $PREFIX
+	#rm -fr $PREFIX
 
 	if ! test -f $RFILE
 	then
