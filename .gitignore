@@ -2,3 +2,4 @@
 *.bz2
 *.tgz
 packagers/*/root/bin/*
+packlist
