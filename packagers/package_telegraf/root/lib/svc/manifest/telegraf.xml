@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<service_bundle type='manifest' name='export'>
+  <service name='influx/telegraf' type='service' version='0'>
+    <create_default_instance enabled='true'/>
+    <single_instance/>
+    <dependency name='multi-user-server' grouping='require_all' restart_on='none' type='service'>
+      <service_fmri value='svc:/milestone/multi-user-server'/>
+    </dependency>
+    <method_context>
+      <method_credential group='daemon'
+      privileges='basic,!file_link_any,'
+      user='telegraf'/>
+    </method_context>
+    <exec_method name='start' type='method'
+      exec='/opt/local/bin/telegraf --config /config/telegraf/telegraf.conf'
+      timeout_seconds='0'/>
+    <exec_method name='stop' type='method' exec=':kill -TERM' timeout_seconds='30'/>
+    <property_group name='startd' type='framework'>
+      <propval name='duration' type='astring' value='child'/>
+    </property_group>
+    <stability value='Unstable'/>
+    <template>
+      <common_name>
+        <loctext xml:lang='C'>Telegraf metric collector</loctext>
+      </common_name>
+      <documentation>
+        <doc_link name='influx.co'
+          uri='https://www.influxdata.com/time-series-platform/telegraf' />
+      </documentation>
+    </template>
+  </service>
+</service_bundle>

@@ -1,0 +1,23 @@
+#!/bin/ksh
+
+PATH=/bin:/opt/local/sbin
+BASE=$(pwd)
+
+rm -f *.tgz
+cp ${GOPATH}/src/github.com/influxdata/telegraf/telegraf root/bin/
+chmod 755 root/bin/telegraf
+
+cd root
+find * -type f -o -type l | sort >${BASE}/packlist
+
+cd $BASE
+
+pkg_create \
+	-B build-info \
+	-c comment \
+	-d description \
+	-f packlist \
+	-I /opt/local \
+	-p root \
+	-U telegraf-$(./root/bin/telegraf --version | \
+				  sed 's/.* v\([^-~ ]*\).*/\1/').tgz
