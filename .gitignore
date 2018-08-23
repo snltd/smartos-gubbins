@@ -1,4 +1,4 @@
 *.gz
 *.bz2
 *.tgz
-packagers/*/bin/*
+packagers/*/root/bin/*
