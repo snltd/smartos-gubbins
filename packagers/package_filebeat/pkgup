@@ -1,0 +1,24 @@
+#!/bin/ksh
+
+PATH=/bin:/opt/local/sbin
+BASE=$(pwd)
+EXEC=root/bin/filebeat
+
+rm -f *.tgz
+
+cp $GOPATH/src/github.com/elastic/beats/filebeat/filebeat $EXEC
+chmod 755 $EXEC
+
+cd root
+find * -type f -o -type l | sort >${BASE}/packlist
+
+cd $BASE
+
+pkg_create \
+	-B build-info \
+	-c comment \
+	-d description \
+	-f packlist \
+	-I /opt/local \
+	-p root \
+	-U filebeat-$($EXEC version | cut -d\  -f3).tgz

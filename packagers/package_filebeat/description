@@ -1,0 +1,4 @@
+Easily ship log file data to Logstash and Elasticsearch to
+centralize your logs and analyze them in real time using Filebeat.
+
+https://www.elastic.co/products/beats/filebeat
