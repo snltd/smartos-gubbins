@@ -1,0 +1,37 @@
+#!/bin/ksh
+
+PATH=/bin:/opt/local/sbin
+BASE=$(pwd)
+TMPDIR=/tmp/caddytmp
+TMPDL=/tmp/caddy.tgz
+EXEC=root/bin/caddy
+
+rm -fr *.tgz $TMPDIR
+mkdir -p $TMPDIR
+
+wget \
+	--no-check-certificate \
+	--quiet \
+	-O $TMPDL \
+	"https://caddyserver.com/download/solaris/amd64?plugins=http.prometheus,tls.dns.ns1&license=personal"
+
+tar zxf $TMPDL -C $TMPDIR
+
+cp $TMPDIR/caddy $EXEC
+chmod 755 $EXEC
+rm -fr $TMPDIR $TMPDL
+
+cd root
+
+find * -type f -o -type l | sort >${BASE}/packlist
+
+cd $BASE
+
+pkg_create \
+	-B build-info \
+	-c comment \
+	-d description \
+	-f packlist \
+	-I /opt/local \
+	-p root \
+	-U caddy-$($EXEC --version | cut -d\  -f2).tgz
